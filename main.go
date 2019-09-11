@@ -102,7 +102,7 @@ func server(listenAddr string) error {
 
 func testar(ctx *gin.Context) {
 	user := "pvr"
-	value := "lalala"
+	value := "lalala!"
 	ok := true
 	if ok {
 		ctx.JSON(http.StatusOK, gin.H{"user": user, "value": value})
