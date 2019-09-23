@@ -105,6 +105,9 @@ image:
 	go build .
 	docker build -t kafkaapi .
 
+# Regular build target
+build:
+	go build . 
 
 # This is pretty much an optional thing that I tend always to include.
 #
