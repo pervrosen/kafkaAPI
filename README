@@ -1,0 +1,5 @@
+KafkaAPI
+
+A test API that exposes some RESTful APIs amonst one that is indeed a kafka REST-api. 
+
+Build using 'docker build . -t kafkaAPI:latest -t kafkaAPI:0.2'
