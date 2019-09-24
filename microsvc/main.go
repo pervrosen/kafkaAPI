@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"kafkaAPI/kafkaUtils"
 	"os"
 	"os/signal"
 	"strings"
@@ -11,22 +12,28 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	kafka "github.com/segmentio/kafka-go"
+	"github.com/segmentio/kafka-go"
 )
 
 var (
 	// kafka
 	kafkaBrokerURL     string
 	kafkaVerbose       bool
-	kafkaTopic         string
+	kafkaTopicIn       string
+	kafkaTopicOut      string
 	kafkaConsumerGroup string
 	kafkaClientID      string
+)
+
+var (
+// kafka
 )
 
 func main() {
 	flag.StringVar(&kafkaBrokerURL, "kafka-brokers", "localhost:19092,localhost:29092,localhost:39092", "Kafka brokers in comma separated value")
 	flag.BoolVar(&kafkaVerbose, "kafka-verbose", true, "Kafka verbose logging")
-	flag.StringVar(&kafkaTopic, "kafka-topic", "foo", "Kafka topic. Only one topic per worker.")
+	flag.StringVar(&kafkaTopicIn, "kafka-topicIn", "foo", "Kafka topic. Only one topic per worker.")
+	flag.StringVar(&kafkaTopicOut, "kafka-topicOut", "foo2", "Kafka topic. Only one topic per worker.")
 	flag.StringVar(&kafkaConsumerGroup, "kafka-consumer-group", "consumer-group", "Kafka consumer group")
 	flag.StringVar(&kafkaClientID, "kafka-client-id", "my-client-id", "Kafka client id")
 
@@ -41,7 +48,7 @@ func main() {
 	config := kafka.ReaderConfig{
 		Brokers:         brokers,
 		GroupID:         kafkaClientID,
-		Topic:           kafkaTopic,
+		Topic:           kafkaTopicIn,
 		MinBytes:        10e3,            // 10KB
 		MaxBytes:        10e6,            // 10MB
 		MaxWait:         1 * time.Second, // Maximum amount of time to wait for new data to come when fetching batches of messages from kafka.
@@ -49,7 +56,17 @@ func main() {
 	}
 
 	reader := kafka.NewReader(config)
+
+	// connect to kafka
+	kafkaProducer, err := kafkaUtils.Configure(strings.Split(kafkaBrokerURL, ","), kafkaClientID, kafkaTopicOut)
+	if err != nil {
+		log.Error().Str("error", err.Error()).Msg("unable to configure kafkaProducer")
+		return
+	}
+
+	defer kafkaProducer.Close()
 	defer reader.Close()
+
 	for {
 		log.Debug().Msg("Inside for loop1")
 		m, err := reader.ReadMessage(context.Background())
@@ -66,6 +83,12 @@ func main() {
 		//		if m.CompressionCodec == snappy.NewCompressionCodec() {
 		//			_, err = snappy.NewCompressionCodec().Decode(value, m.Value)
 		//		}
+
+		var ctx = context.Background()
+		err = kafkaUtils.Push(ctx, nil, m.Value)
+		if err != nil {
+			log.Error().Msg("Kafka write to topic Out failed")
+		}
 
 		log.Debug().Msg("Inside for loop3")
 		if err != nil {
