@@ -102,8 +102,12 @@ fmt: $(GO_SRC_DIRS)
 # having to worry about the retrieval of the binary and execution of it
 # - docker already provides the necessary boundaries.
 image:
-	go build .
-	docker build -t kafkaapi .
+	docker build . -t kafkarestapi:latest -f ./DockerfileRESTapi
+	docker build . -t kafkamsvc:latest -f ./DockerfileMSVC
+	docker tag kafkarestapi:latest pervonrosen/kafkarestapi:latest
+	docker tag kafkamsvc:latest pervonrosen/kafkamsvc:latest
+	docker push pervonrosen/kafkarestapi
+	docker push pervonrosen/kafkamsvc
 
 # Regular build target
 build:
