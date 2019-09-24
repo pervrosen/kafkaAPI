@@ -84,7 +84,7 @@ func server(listenAddr string) error {
 		if user == "pvr" {
 			c.JSON(http.StatusOK, gin.H{"user": user, "value": "Superhero"})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
+			c.JSON(http.StatusOK, gin.H{"user": user, "value": "no value"})
 		}
 	})
 
@@ -107,7 +107,7 @@ func testar(ctx *gin.Context) {
 	if ok {
 		ctx.JSON(http.StatusOK, gin.H{"user": user, "value": value})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
+		ctx.JSON(http.StatusOK, gin.H{"user": user, "value": "no value"})
 	}
 }
 
