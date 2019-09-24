@@ -2,7 +2,6 @@ package kafkaUtils
 
 import (
 	"context"
-
 	"time"
 
 	"github.com/segmentio/kafka-go"
