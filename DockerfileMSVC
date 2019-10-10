@@ -26,4 +26,4 @@ COPY --from=builder /usr/bin/kafkaAPI /usr/local/bin/kafkaAPI
 
 # Set the binary as the entrypoint of the container
 EXPOSE 9000/tcp
-ENTRYPOINT [ "kafkaAPI" ]
+ENTRYPOINT [ "kafkaAPI", "--kafka-brokers='kafka:29092' --kafka-verbose=true --kafka-client-id='C' --kafka-topic='foo'" ]
